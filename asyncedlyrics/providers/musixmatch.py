@@ -21,7 +21,6 @@ class Musixmatch(LRCProvider):
         self.lang = lang
         self.enhanced = enhanced
         self.token = None
-        self.session = aiohttp.ClientSession()
 
     async def _get(self, action: str, query: List[tuple]):
         if action != "token.get" and self.token is None:
@@ -33,15 +32,15 @@ class Musixmatch(LRCProvider):
         query.append(("t", t))
         url = self.ROOT_URL + action
         async with self.session as session:
-            response = await session.get(url, params=query)
-            if response.headers['Content-Type'].startswith('application/json'):
-                return await response.json()
-            elif response.headers['Content-Type'].startswith('text/plain'):
-                text = await response.text()
-                return json.loads(text)
-            else:
-                text = await response.text()
-                raise ValueError(f"Unexpected content type: {response.headers['Content-Type']}, content: {text}")
+            async with session.get(url, params=query) as response:
+                if response.headers['Content-Type'].startswith('application/json'):
+                    return await response.json()
+                elif response.headers['Content-Type'].startswith('text/plain'):
+                    text = await response.text()
+                    return json.loads(text)
+                else:
+                    text = await response.text()
+                    raise ValueError(f"Unexpected content type: {response.headers['Content-Type']}, content: {text}")
 
     async def _get_token(self):
         token_path = get_cache_path("asyncedlyrics", False) / "musixmatch_token.json"

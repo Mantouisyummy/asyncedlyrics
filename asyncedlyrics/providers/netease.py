@@ -21,35 +21,35 @@ class NetEase(LRCProvider):
         """Returns a `dict` containing some metadata for the found track."""
         params = {"limit": 10, "type": 1, "offset": 0, "s": search_term}
         async with self.session as session:
-            response = await session.get(self.API_ENDPOINT_METADATA, params=params)
-            try:
-                results = (await response.json()).get("result", {}).get("songs")
-            except aiohttp.ContentTypeError:
-                text = await response.text()
-                results = json.loads(text).get("result", {}).get("songs")
+            async with session.get(self.API_ENDPOINT_METADATA, params=params) as response:
+                try:
+                    results = (await response.json()).get("result", {}).get("songs")
+                except aiohttp.ContentTypeError:
+                    text = await response.text()
+                    results = json.loads(text).get("result", {}).get("songs")
 
-            if not results:
-                return None
-            cmp_key = lambda t: f"{t.get('name')} {t.get('artists')[0].get('name')}"
-            track = get_best_match(results, search_term, cmp_key)
-            # Update the session cookies from the new sent cookies for the next request.
-            self.session.cookie_jar.update_cookies(response.cookies)
-            self.session.headers.update({"referer": str(response.url)})
-            return track
+                if not results:
+                    return None
+                cmp_key = lambda t: f"{t.get('name')} {t.get('artists')[0].get('name')}"
+                track = get_best_match(results, search_term, cmp_key)
+                # Update the session cookies from the new sent cookies for the next request.
+                self.session.cookie_jar.update_cookies(response.cookies)
+                self.session.headers.update({"referer": str(response.url)})
+                return track
 
     async def get_lrc_by_id(self, track_id: str) -> Optional[Lyrics]:
         params = {"id": track_id, "lv": 1}
         async with self.session as session:
-            response = await session.get(self.API_ENDPOINT_LYRICS, params=params)
-            try:
-                lrc_data = (await response.json()).get("lrc", {}).get("lyric")
-            except aiohttp.ContentTypeError:
-                text = await response.text()
-                lrc_data = json.loads(text).get("lrc", {}).get("lyric")
+            async with session.get(self.API_ENDPOINT_LYRICS, params=params) as response:
+                try:
+                    lrc_data = (await response.json()).get("lrc", {}).get("lyric")
+                except aiohttp.ContentTypeError:
+                    text = await response.text()
+                    lrc_data = json.loads(text).get("lrc", {}).get("lyric")
 
-        lrc = Lyrics()
-        lrc.add_unknown(lrc_data)
-        return lrc
+                lrc = Lyrics()
+                lrc.add_unknown(lrc_data)
+                return lrc
 
     async def get_lrc(self, search_term: str) -> Coroutine[Any, Any, Optional[Lyrics]] | None:
         track = await self.search_track(search_term)
