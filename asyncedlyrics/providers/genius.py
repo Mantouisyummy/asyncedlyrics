@@ -12,7 +12,8 @@ class Genius(LRCProvider):
         cookies = {
             "obuid": "e3ee67e0-7df9-4181-8324-d977c6dc9250",
         }
-        async with self.session.get(self.SEARCH_ENDPOINT, params=params, cookies=cookies) as r:
+        async with self.session as session:
+            r = await session.get(self.SEARCH_ENDPOINT, params=params, cookies=cookies)
             if not r.ok:
                 return None
             data = await r.json()

@@ -32,7 +32,8 @@ class Musixmatch(LRCProvider):
         t = str(int(time.time() * 1000))
         query.append(("t", t))
         url = self.ROOT_URL + action
-        async with self.session.get(url, params=query) as response:
+        async with self.session as session:
+            response = await session.get(url, params=query)
             if response.headers['Content-Type'].startswith('application/json'):
                 return await response.json()
             elif response.headers['Content-Type'].startswith('text/plain'):

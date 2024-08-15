@@ -19,7 +19,8 @@ class Lrclib(LRCProvider):
 
     async def get_lrc_by_id(self, track_id: str) -> Optional[Lyrics]:
         url = self.LRC_ENDPOINT + track_id
-        async with self.session.get(url) as r:
+        async with self.session as session:
+            r = await session.get(url)
             if not r.ok:
                 return None
             track = await r.json()
@@ -30,7 +31,8 @@ class Lrclib(LRCProvider):
 
     async def get_lrc(self, search_term: str) -> Coroutine[Any, Any, Lyrics | None] | None:
         url = self.SEARCH_ENDPOINT
-        async with self.session.get(url, params={"q": search_term}) as r:
+        async with self.session as session:
+            r = await session.get(url, params={"q": search_term})
             if not r.ok:
                 return None
             tracks = await r.json()

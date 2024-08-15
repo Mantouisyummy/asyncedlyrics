@@ -9,7 +9,7 @@ async def cli_handler():
     This parses the CLI arguments passed to `asyncedlyrics -OPTIONS` command
     """
     parser = argparse.ArgumentParser(
-        description="Search for an LRC format (synchronized lyrics) of a music"
+        description="Search for an LRC format (asynchronized lyrics) of a music"
     )
     parser.add_argument("search_term", help="The search term to find the track.")
     parser.add_argument(
