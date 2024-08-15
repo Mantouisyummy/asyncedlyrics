@@ -1,11 +1,11 @@
 # asyncedlyrics
- Get an LRC format (asynchronized) lyrics for your music.
+ A fork of [Syncedlyrics](https://github.com/moehmeni/syncedlyrics). Asynchronous Get an LRC format lyrics for your music.
  
  [![Downloads](https://static.pepy.tech/badge/asyncedlyrics/month)](https://pepy.tech/project/asyncedlyrics)
 
 ## Installation
 ```
-pip install asyncedlyrics
+pip install git+https://github.com/Mantouisyummy/asyncedlyrics.git
 ```
 ## Usage
 ### CLI
