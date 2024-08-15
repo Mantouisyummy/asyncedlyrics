@@ -15,7 +15,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.8"
-aiohttp = "^3.10.3"
+aiohttp = "^3.7.0"
 beautifulsoup4 = "^4.12.3"
 rapidfuzz = "^3.6.2"
 pytest = "^8.3.2"
