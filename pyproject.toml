@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "asyncedlyrics"
+version = "0.0.1"
+description = "A fork of Syncedlyrics. Asynchronous Get an LRC format lyrics for your music"
+repository = "https://github.com/rtcq/syncedlyrics"
+urls = { "Bug Tracker" = "https://github.com/rtcq/syncedlyrics/issues" }
+authors = ["Mantouisyummy <opcantel@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+classifiers = [
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Multimedia :: Sound/Audio :: Players",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+aiohttp = "^3.10.3"
+beautifulsoup4 = "^4.12.3"
+rapidfuzz = "^3.6.2"
+pytest = "^8.3.2"
+pytest-asyncio = "^0.23.8"
+
+[tool.poetry.scripts]
+asyncedlyrics = "asyncedlyrics.cli:cli_handler"
+
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^8.0.2"
+black = "^24.4.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
