@@ -36,6 +36,7 @@ jobs:
       - name: Inatalling dependencies
         run: |
           poetry env use ${{ matrix.python-version }}
+          poetry lock
           poetry install
 
       - name: Running provider tests
