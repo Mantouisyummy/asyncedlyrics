@@ -7,6 +7,7 @@ from typing import Union, Callable, Optional
 import datetime
 from enum import Enum, auto
 import re
+import aiohttp
 import os
 from pathlib import Path
 
@@ -105,16 +106,17 @@ def has_translation(lrc: str) -> bool:
     return True
 
 
-async def generate_bs4_soup(session, url: str, **kwargs):
+async def generate_bs4_soup(url: str, **kwargs):
     """Returns a `BeautifulSoup` from the given `url`.
     Tries to use `lxml` as the parser if available, otherwise `html.parser`
     """
-    async with session.get(url) as r:
-        try:
-            soup = BeautifulSoup(r.text, features="lxml", **kwargs)
-        except FeatureNotFound:
-            soup = BeautifulSoup(r.text, features="html.parser", **kwargs)
-        return soup
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as r:
+            try:
+                soup = BeautifulSoup(await r.text(), features="lxml", **kwargs)
+            except FeatureNotFound:
+                soup = BeautifulSoup(await r.text(), features="html.parser", **kwargs)
+            return soup
 
 
 def format_time(time_in_seconds: float):

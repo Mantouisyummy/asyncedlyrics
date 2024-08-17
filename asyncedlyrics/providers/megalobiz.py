@@ -21,7 +21,7 @@ class Megalobiz(LRCProvider):
             return False
 
         a_tags_boud = SoupStrainer("a", href=href_match)
-        soup = await generate_bs4_soup(self.session, url, parse_only=a_tags_boud)
+        soup = await generate_bs4_soup(url, parse_only=a_tags_boud)
 
         def a_text(a):
             # In MegaLobiz, we have some `a` tags that have the following text:
@@ -34,7 +34,7 @@ class Megalobiz(LRCProvider):
             return None
         # Scraping from the LRC page
         lrc_id = a_tag["href"].split(".")[-1]
-        soup = await generate_bs4_soup(self.session, self.ROOT_URL + a_tag["href"])
+        soup = await generate_bs4_soup(self.ROOT_URL + a_tag["href"])
         lrc_str = soup.find("div", {"id": f"lrc_{lrc_id}_details"}).get_text()
         lrc = Lyrics()
         lrc.add_unknown(lrc_str)

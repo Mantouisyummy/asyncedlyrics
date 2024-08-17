@@ -10,7 +10,7 @@ lrc_text = asyncedlyrics.search("[TRACK_NAME] [ARTIST_NAME]")
 import logging
 from typing import List, Optional
 
-from .providers import Deezer, Lrclib, Musixmatch, NetEase, Megalobiz, Genius
+from .providers import Lrclib, Musixmatch, NetEase, Megalobiz, Genius
 from .utils import Lyrics, TargetType
 from .providers.base import LRCProvider
 

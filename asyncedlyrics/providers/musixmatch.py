@@ -31,16 +31,16 @@ class Musixmatch(LRCProvider):
         t = str(int(time.time() * 1000))
         query.append(("t", t))
         url = self.ROOT_URL + action
-        async with self.session as session:
-            async with session.get(url, params=query) as response:
-                if response.headers['Content-Type'].startswith('application/json'):
-                    return await response.json()
-                elif response.headers['Content-Type'].startswith('text/plain'):
-                    text = await response.text()
-                    return json.loads(text)
-                else:
-                    text = await response.text()
-                    raise ValueError(f"Unexpected content type: {response.headers['Content-Type']}, content: {text}")
+        session = await self.get_session()
+        async with session.get(url, params=query) as response:
+            if response.headers['Content-Type'].startswith('application/json'):
+                return await response.json()
+            elif response.headers['Content-Type'].startswith('text/plain'):
+                text = await response.text()
+                return json.loads(text)
+            else:
+                text = await response.text()
+                raise ValueError(f"Unexpected content type: {response.headers['Content-Type']}, content: {text}")
 
     async def _get_token(self):
         token_path = get_cache_path("asyncedlyrics", False) / "musixmatch_token.json"
