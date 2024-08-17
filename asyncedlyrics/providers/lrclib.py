@@ -20,26 +20,32 @@ class Lrclib(LRCProvider):
     async def get_lrc_by_id(self, track_id: str) -> Optional[Lyrics]:
         url = self.LRC_ENDPOINT + track_id
         session = await self.get_session()
-        async with session.get(url) as r:
-            if not r.ok:
-                return None
-            track = await r.json()
-            lrc = Lyrics()
-            lrc.synced = track.get("syncedLyrics")
-            lrc.unsynced = track.get("plainLyrics")
-            return lrc
+        try:
+            async with session.get(url) as r:
+                if not r.ok:
+                    return None
+                track = await r.json()
+                lrc = Lyrics()
+                lrc.synced = track.get("syncedLyrics")
+                lrc.unsynced = track.get("plainLyrics")
+                return lrc
+        finally:
+            await session.close()
 
     async def get_lrc(self, search_term: str) -> Coroutine[Any, Any, Lyrics | None] | None:
         url = self.SEARCH_ENDPOINT
         session = await self.get_session()
-        async with session.get(url, params={"q": search_term}) as r:
-            if not r.ok:
-                return None
-            tracks = await r.json()
-            if not tracks:
-                return None
-            tracks = sort_results(
-                tracks, search_term, lambda t: f'{t["artistName"]} - {t["trackName"]}'
-            )
-            _id = str(tracks[0]["id"])
-            return await self.get_lrc_by_id(_id)
+        try:
+            async with session.get(url, params={"q": search_term}) as r:
+                if not r.ok:
+                    return None
+                tracks = await r.json()
+                if not tracks:
+                    return None
+                tracks = sort_results(
+                    tracks, search_term, lambda t: f'{t["artistName"]} - {t["trackName"]}'
+                )
+                _id = str(tracks[0]["id"])
+                return await self.get_lrc_by_id(_id)
+        finally:
+            await session.close()
