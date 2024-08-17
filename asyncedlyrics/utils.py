@@ -111,13 +111,15 @@ async def generate_bs4_soup(url: str, **kwargs):
     Tries to use `lxml` as the parser if available, otherwise `html.parser`
     """
     async with aiohttp.ClientSession() as session:
-        async with session.get(url) as r:
-            try:
-                soup = BeautifulSoup(await r.text(), features="lxml", **kwargs)
-            except FeatureNotFound:
-                soup = BeautifulSoup(await r.text(), features="html.parser", **kwargs)
-            return soup
-
+        try:
+            async with session.get(url) as r:
+                try:
+                    soup = BeautifulSoup(await r.text(), features="lxml", **kwargs)
+                except FeatureNotFound:
+                    soup = BeautifulSoup(await r.text(), features="html.parser", **kwargs)
+                return soup
+        finally:
+            await session.close()
 
 def format_time(time_in_seconds: float):
     """Returns a [mm:ss.xx] formatted string from the given time in seconds."""
