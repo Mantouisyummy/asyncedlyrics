@@ -2,8 +2,8 @@
 name = "asyncedlyrics"
 version = "0.0.1"
 description = "A fork of Syncedlyrics. Asynchronous Get an LRC format lyrics for your music"
-repository = "https://github.com/rtcq/syncedlyrics"
-urls = { "Bug Tracker" = "https://github.com/rtcq/syncedlyrics/issues" }
+repository = "https://github.com/Mantouisyummy/asyncedlyrics"
+urls = { "Bug Tracker" = "https://github.com/Mantouisyummy/asyncedlyrics/issues" }
 authors = ["Mantouisyummy <opcantel@gmail.com>"]
 license = "MIT"
 readme = "README.md"
