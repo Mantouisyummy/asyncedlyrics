@@ -2,7 +2,7 @@
 import json
 from typing import Optional, Any, Coroutine
 from .base import LRCProvider
-from ..utils import Lyrics, get_best_match
+from ..utils import Lyrics, get_best_match, get_session
 import aiohttp
 
 class NetEase(LRCProvider):
@@ -17,8 +17,7 @@ class NetEase(LRCProvider):
     async def search_track(self, search_term: str) -> Optional[dict]:
         """Returns a `dict` containing some metadata for the found track."""
         params = {"limit": 10, "type": 1, "offset": 0, "s": search_term}
-        session = await self.get_session(netease=True)
-        try:
+        async with get_session(netease=True) as session:
             async with session.get(self.API_ENDPOINT_METADATA, params=params) as response:
                 try:
                     results = (await response.json()).get("result", {}).get("songs")
@@ -34,13 +33,10 @@ class NetEase(LRCProvider):
                 session.cookie_jar.update_cookies(response.cookies)
                 session.headers.update({"referer": str(response.url)})
                 return track
-        finally:
-            await session.close()
 
     async def get_lrc_by_id(self, track_id: str) -> Optional[Lyrics]:
         params = {"id": track_id, "lv": 1}
-        session = await self.get_session()
-        try:
+        async with get_session() as session:
             async with session.get(self.API_ENDPOINT_LYRICS, params=params) as response:
                 try:
                     lrc_data = (await response.json()).get("lrc", {}).get("lyric")
@@ -51,8 +47,6 @@ class NetEase(LRCProvider):
                 lrc = Lyrics()
                 lrc.add_unknown(lrc_data)
                 return lrc
-        finally:
-            await session.close()
 
     async def get_lrc(self, search_term: str) -> Coroutine[Any, Any, Optional[Lyrics]] | None:
         track = await self.search_track(search_term)

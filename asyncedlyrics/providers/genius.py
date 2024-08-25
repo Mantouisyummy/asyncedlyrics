@@ -1,6 +1,7 @@
 from typing import Optional
 from .base import LRCProvider
-from ..utils import Lyrics, generate_bs4_soup
+from ..utils import Lyrics, generate_bs4_soup, get_session
+
 
 class Genius(LRCProvider):
     """Genius provider class"""
@@ -12,8 +13,7 @@ class Genius(LRCProvider):
         cookies = {
             "obuid": "e3ee67e0-7df9-4181-8324-d977c6dc9250",
         }
-        session = await self.get_session()
-        try:
+        async with get_session() as session:
             async with session.get(self.SEARCH_ENDPOINT, params=params, cookies=cookies) as r:
                 if not r.ok:
                     return None
@@ -32,5 +32,3 @@ class Genius(LRCProvider):
                 lrc = Lyrics()
                 lrc.unsynced = lrc_str
                 return lrc
-        finally:
-            await session.close()

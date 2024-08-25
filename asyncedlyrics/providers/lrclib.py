@@ -1,9 +1,7 @@
-"""Lrclib (lrclib.net) LRC provider"""
-
 from typing import Optional, Any, Coroutine
 from .base import LRCProvider
-from ..utils import Lyrics, sort_results
-import aiohttp
+from ..utils import Lyrics, sort_results, get_session
+
 
 class Lrclib(LRCProvider):
     """Lrclib LRC provider class"""
@@ -15,12 +13,10 @@ class Lrclib(LRCProvider):
 
     def __init__(self) -> None:
         super().__init__()
-        self.session = aiohttp.ClientSession()
 
     async def get_lrc_by_id(self, track_id: str) -> Optional[Lyrics]:
         url = self.LRC_ENDPOINT + track_id
-        session = await self.get_session()
-        try:
+        async with get_session() as session:
             async with session.get(url) as r:
                 if not r.ok:
                     return None
@@ -29,13 +25,10 @@ class Lrclib(LRCProvider):
                 lrc.synced = track.get("syncedLyrics")
                 lrc.unsynced = track.get("plainLyrics")
                 return lrc
-        finally:
-            await session.close()
 
-    async def get_lrc(self, search_term: str) -> Coroutine[Any, Any, Lyrics | None] | None:
+    async def get_lrc(self, search_term: str) -> Coroutine[Any, Any, Optional[Lyrics]] | None:
         url = self.SEARCH_ENDPOINT
-        session = await self.get_session()
-        try:
+        async with get_session() as session:
             async with session.get(url, params={"q": search_term}) as r:
                 if not r.ok:
                     return None
@@ -47,5 +40,3 @@ class Lrclib(LRCProvider):
                 )
                 _id = str(tracks[0]["id"])
                 return await self.get_lrc_by_id(_id)
-        finally:
-            await session.close()

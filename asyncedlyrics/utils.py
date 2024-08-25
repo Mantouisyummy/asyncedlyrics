@@ -121,11 +121,12 @@ async def generate_bs4_soup(url: str, **kwargs):
         finally:
             await session.close()
 
+
 def format_time(time_in_seconds: float):
     """Returns a [mm:ss.xx] formatted string from the given time in seconds."""
     time = datetime.timedelta(seconds=time_in_seconds)
     minutes, seconds = divmod(time.seconds, 60)
-    return f"{minutes:02}:{seconds:02}.{time.microseconds//10000:02}"
+    return f"{minutes:02}:{seconds:02}.{time.microseconds // 10000:02}"
 
 
 def str_score(a: str, b: str) -> float:
@@ -144,9 +145,9 @@ def str_same(a: str, b: str, n: int) -> bool:
 
 
 def sort_results(
-    results: list,
-    search_term: str,
-    compare_key: Union[str, Callable[[dict], str]] = "name",
+        results: list,
+        search_term: str,
+        compare_key: Union[str, Callable[[dict], str]] = "name",
 ) -> list:
     """
     Sorts the API results based on the similarity score of the `compare_key` with
@@ -159,7 +160,6 @@ def sort_results(
     function that takes a track and returns a string.
     """
     if isinstance(compare_key, str):
-
         def compare_key(t):
             return t[compare_key]
 
@@ -169,11 +169,22 @@ def sort_results(
     return sorted(results, key=sort_key, reverse=True)
 
 
+def get_session(netease: bool = False) -> aiohttp.ClientSession:
+    if netease:
+        headers_text = (
+            "NMTID=00OAVK3xqDG726ITU6jopU6jF2yMk0AAAGCO8l1BA; JSESSIONID-WYYY=8KQo11YK2GZP45RMlz8Kn80vHZ9%2FGvwzRKQXXy0iQoFKycWdBlQjbfT0MJrFa6hwRfmpfBYKeHliUPH287JC3hNW99WQjrh9b9RmKT%2Fg1Exc2VwHZcsqi7ITxQgfEiee50po28x5xTTZXKoP%2FRMctN2jpDeg57kdZrXz%2FD%2FWghb%5C4DuZ%3A1659124633932; _iuqxldmzr_=32; _ntes_nnid=0db6667097883aa9596ecfe7f188c3ec,1659122833973; _ntes_nuid=0db6667097883aa9596ecfe7f188c3ec; WNMCID=xygast.1659122837568.01.0; WEVNSM=1.0.0; WM_NI=CwbjWAFbcIzPX3dsLP%2F52VB%2Bxr572gmqAYwvN9KU5X5f1nRzBYl0SNf%2BV9FTmmYZy%2FoJLADaZS0Q8TrKfNSBNOt0HLB8rRJh9DsvMOT7%2BCGCQLbvlWAcJBJeXb1P8yZ3RHA%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6ee90c65b85ae87b9aa5483ef8ab3d14a939e9a83c459959caeadce47e991fbaee82af0fea7c3b92a81a9ae8bd64b86beadaaf95c9cedac94cf5cedebfeb7c121bcaefbd8b16dafaf8fbaf67e8ee785b6b854f7baff8fd1728287a4d1d246a6f59adac560afb397bbfc25ad9684a2c76b9a8d00b2bb60b295aaafd24a8e91bcd1cb4882e8beb3c964fb9cbd97d04598e9e5a4c6499394ae97ef5d83bd86a3c96f9cbeffb1bb739aed9ea9c437e2a3; WM_TID=AAkRFnl03RdABEBEQFOBWHCPOeMra4IL; playerid=94262567"
+        )
+        return aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(sock_connect=5, sock_read=20),
+                                     headers={"cookie": headers_text})
+    else:
+        return aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(sock_connect=5, sock_read=20))
+
+
 def get_best_match(
-    results: list,
-    search_term: str,
-    compare_key: Union[str, Callable[[dict], str]] = "name",
-    min_score: int = 65,
+        results: list,
+        search_term: str,
+        compare_key: Union[str, Callable[[dict], str]] = "name",
+        min_score: int = 65,
 ) -> Optional[dict]:
     """
     Returns the best match from the API results based on the similarity score of the `compare_key`

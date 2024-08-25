@@ -4,7 +4,7 @@ from typing import Optional, List, Any, Coroutine
 import time
 import json
 from .base import LRCProvider
-from ..utils import Lyrics, get_best_match, format_time, get_cache_path
+from ..utils import Lyrics, get_best_match, format_time, get_cache_path, get_session
 import aiohttp
 
 # Inspired from https://github.com/Marekkon5/onetagger/blob/0654131188c4df2b4b171ded7cdb927a4369746e/crates/onetagger-platforms/src/musixmatch.rs
@@ -31,8 +31,7 @@ class Musixmatch(LRCProvider):
         t = str(int(time.time() * 1000))
         query.append(("t", t))
         url = self.ROOT_URL + action
-        session = await self.get_session()
-        try:
+        async with get_session() as session:
             async with session.get(url, params=query) as response:
                 if response.headers['Content-Type'].startswith('application/json'):
                     return await response.json()
@@ -42,8 +41,6 @@ class Musixmatch(LRCProvider):
                 else:
                     text = await response.text()
                     raise ValueError(f"Unexpected content type: {response.headers['Content-Type']}, content: {text}")
-        finally:
-            await session.close()
 
     async def _get_token(self):
         token_path = get_cache_path("asyncedlyrics", False) / "musixmatch_token.json"
